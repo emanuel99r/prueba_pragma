@@ -19,6 +19,8 @@ La configuración para la ejecución del pipeline se hace a través del archivo 
 Para ejecutar el pipeline, simplemente ejecute el script Python:
 
 ```bash
+pip install -r requirements.txt
+
 python pipeline.py
 ```
 
