@@ -20,20 +20,26 @@ def process_csv_file(file_path, connection, table_name, micro_batch_size):
         ValueError: Si se produce un error al procesar o cargar los datos.
 
     """
-    global total_rows, total_valid_rows, min_price, max_price, sum_price  # Declara como variables globales
+
+    # El uso de variables globales permite en este caso mantener las estadísticas acumulativas
+    global total_rows, total_valid_rows, min_price, max_price, sum_price
     cursor = connection.cursor()
     try:
-        for rows in pd.read_csv(file_path, chunksize=micro_batch_size):
+        # Se toman las filas que el parámetro micro_batch_size indique 
+        for rows in pd.read_csv(file_path, chunksize = micro_batch_size):
+
+            # Se recorren las filas tomadas
             for index, row in rows.iterrows():
-                #print(row)
-                #row = rows.iloc[0]
 
                 # Convierte los valores de 'price' y 'user_id' a enteros, si son válidos
                 price = int(row['price']) if pd.notna(row['price']) else None
                 user_id = int(row['user_id']) if pd.notna(row['user_id']) else None
 
+                # Consulta a la base datos para ir insertando las filas
                 cursor.execute(f"INSERT INTO {table_name} (timestamp, price, user_id) VALUES (?, ?, ?)",
                             (row['timestamp'], price, user_id))
+                
+                # Se aplican los cambios
                 connection.commit()
 
                 # Actualiza estadísticas acumulativas
@@ -47,7 +53,7 @@ def process_csv_file(file_path, connection, table_name, micro_batch_size):
                         max_price = current_price
                     sum_price += current_price
 
-                # Imprime estadísticas acumulativas
+            # Imprime estadísticas acumulativas
             print_cumulative_statistics(total_rows, total_valid_rows, min_price, max_price, sum_price)
     except Exception as e:
         raise ValueError(f"Error al procesar el archivo CSV '{file_path}': {str(e)}")
@@ -132,8 +138,10 @@ if __name__ == "__main__":
     csv_file = configuration['csv_files']
     micro_batch_size = configuration["micro_batch_size"]
 
-    # Procesa cada archivo CSV fila por fila y almacena los datos en una sola tabla
+    # Conexión a la base de datos
+    # El uso de un contexto with para gestionar la conexión a la base de datos SQLite garantiza que se cierre correctamente.
     with sqlite3.connect(db_path) as conn:
+
         # Crea la tabla si no existe
         conn.execute(f'''
             CREATE TABLE IF NOT EXISTS {table_name} (
@@ -142,6 +150,8 @@ if __name__ == "__main__":
                 user_id INTEGER
             )
         ''')
+
+        # Procesamiento de cada archivo CSV de manera secuencial. Esto asegura que no se guarden todos los archivos al tiempo en memoria.
         for csv_file in csv_file:
             process_csv_file(csv_file, conn, table_name, micro_batch_size)
         
