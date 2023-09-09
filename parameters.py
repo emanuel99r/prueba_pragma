@@ -7,7 +7,7 @@ configuration = {
                 'dataPruebaDataEngineer/2012-3.csv',
                 'dataPruebaDataEngineer/2012-4.csv',
                 'dataPruebaDataEngineer/2012-5.csv'],
-  "micro_batch_size": 10
+  "micro_batch_size": 1
 
             
 }
