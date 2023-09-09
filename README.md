@@ -32,10 +32,10 @@ La función `process_csv_file` lee un archivo CSV y carga sus datos en una base 
 
 #### Parámetros
 
-`file_path` (`str`): Ruta al archivo CSV que se va a procesar.
-`connection` (`sqlite3.Connection`): Objeto con la conexión a la base de datos SQLite.
-`table_name` (`str`): Nombre de la tabla en la base de datos donde se cargarán los datos.
-`micro_batch_size` (`int`): Tamaño de los fragmentos en los que leerá el conjunto de datos.
+- `file_path` (`str`): Ruta al archivo CSV que se va a procesar.
+- `connection` (`sqlite3.Connection`): Objeto con la conexión a la base de datos SQLite.
+- `table_name` (`str`): Nombre de la tabla en la base de datos donde se cargarán los datos.
+- `micro_batch_size` (`int`): Tamaño de los fragmentos en los que leerá el conjunto de datos.
 
 #### Devuelve
 
